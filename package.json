@@ -1,0 +1,28 @@
+{
+  "name": "storefrontapp",
+  "version": "1.0.0",
+  "description": "store front like app using nodejs and mysql",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cookies4u/storeFront.git"
+  },
+  "keywords": [
+    "node",
+    "mysql"
+  ],
+  "author": "Juan C.",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cookies4u/storeFront/issues"
+  },
+  "homepage": "https://github.com/cookies4u/storeFront#readme",
+  "dependencies": {
+    "inquirer": "^3.0.6",
+    "mysql": "^2.13.0",
+    "request": "^2.81.0"
+  }
+}
