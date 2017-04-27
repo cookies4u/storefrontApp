@@ -1,19 +1,19 @@
+// node access to...
 var mysql = require("mysql");
 var inquirer = require("inquirer");
 
-//var connection = require('./db');
-
+// access classes from other js files
 var CustomerView = require("./customerView");
 var customerView1 = new CustomerView();
 
 var ManagerView = require("./managerView");
 var managerView1 = new ManagerView();
 
-
 var SupervisorView = require("./supervisorView");
 var supervisorView1 = new SupervisorView();
 
-// function which prompts the user for the action they should take
+
+// prompt user. which action to perform
 var start = function() {
   console.log("runnning start");
   inquirer.prompt({

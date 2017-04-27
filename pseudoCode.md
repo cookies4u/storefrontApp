@@ -1,56 +1,86 @@
-Main.JS
+************* bamazonCustomer.JS ************* 
 
-sql connection success runs start function
+func. start
+	prompt user for a selection
 
-funct. start
-	choice selection
-	if userInput_Action = "user"
-		get user input
-		checkInvt()
-		cost()
-	if userInput_action = "manager"
-		get user input
-	if if userInput_action = "supervisor"
-		get user input
-		
+	if userSelection = "customer"
+		run customerView.js file
+	if userSelection = "manager"
+		run managerViwe.js file
+	if userSelection = "supervisor"
+		run supervisorView.js file
 
-user.js
-class created
-User PROVIDES ID & quantity
-funct. invtUpdate
-	query1 = Select quantity where ID = userInput_id
-		quantity = quantity - userInput_quantity
-	query2 = UPDATE quantity WHERE ID = userInput_id
-funct. checkInvt
-	query1 = Select quantity where ID = userInput_id
-	if quantity - userInput_quantity < 0
-		console "sorry there aren't enough products. You can purchase " + quantity + " instead"
-	else invtUpdate();
-funct. cost
-	query1 = SELECT price WHERE ID = userInput_id
-	cost = price * quantity
+************* customerView.js ************* 
 
-manager.js
-class created
+sql connection success runs update function
 
-view products for sale
-	list * ids, name, prices, quantities
-view low inventory
-	inventory count lower than 5 listed
-add invenotry
-	increase quantity of any existing item
-add new product
-	add completly new product
+User provides ID & quantity
 
-supervisor.js
-class created
+func. update quantity
+	query1 = SELECT quantityDB FROM product WHERE ID = userInput_id
+		NewQuantity = quantityDB - userInput_quantity
+	query2 = UPDATE product SET quantityDB = NewQuantity WHERE ID = userInput_id
 
-<sql not in the js file>
-create departments table: department_id, department_name, over_head_cost (dummy number per department), total_sales
+func. purchase cost
+	TotalSales = NewQuantity * price // printed to the screen and used to update departments
+	query1 = SELECT totalSalesDB FROM department WHERE department_name = userInput_DeptName
+		NewTotalSales = totalSalesDB + TotalSales
+	query2 = UPDATE department SET totalSalesDB = NewTotalSales WHERE department_name = userInput_DeptName
 
-view product sales by department
-	display summary table
-		TotalProfit = totalSales - over_head_cost
-create new department
-	
-	
+func. show all items in product table
+	query1 = SELECT * FROM products
+
+
+************* managerView.js ************* 
+func. startManager
+	prompt user for a selection
+	if userSelection = "view products"
+		run showProducts()
+	if userSelection = "view low inventory"
+		run lowInventory()
+	if userSelection = "add inventory"
+		run addInvenotry()
+	if userSelection = "add product"
+		run addProduct()
+	if userSelection = "back to main"
+		run start() // from bamazonCustomer.js
+
+func. showProducts
+	query1 = SELECT * FROM product
+func. lowInventory
+	query1 = SELECT productName, Quantity FROM product WHERE quantity < 5
+func. addInvenotry
+	query1 = SELECT quantityDB FROM product WHERE ID = userInput_id
+		NewQuantity = quantityDB + userInput_quantity
+	query2 = UPDATE product SET quantityDB = NewQuantity WHERE ID = userInput_id
+func. addProduct
+	query1 = INSERT INTO product SET (prompts)
+        user prompted to provide the required table fields
+
+************* supervisorView.js ************* 
+
+func. startSupervisor
+	prompt user for a selection
+	if userSelection = "add new department"
+		run addDept()
+	if userSelection = "view all departments"
+		run showDepts()
+	if userSelection = "back to main"
+		run start() // from bamazonCustomer.js
+
+func. addDept
+    query1 = INSERT INTO department SET (prompts)
+        user prompted to provide the required table fields
+func. showDepts
+    query1 = using product and deparment tables to dispaly a department summary with product total sales
+    SELECT departments.department_id, departments.department_name, departments.over_head_costs, total_sales_by_dept.total_sales, (total_sales_by_dept.total_sales - departments.over_head_costs) AS total_profits 
+    FROM departments 
+    INNER JOIN 
+        (SELECT department_name, SUM(product_sales) AS total_sales 
+        FROM products 
+        GROUP BY department_name) 
+        total_sales_by_dept 
+    WHERE departments.department_name = total_sales_by_dept.department_name";
+
+
+
