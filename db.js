@@ -2,6 +2,7 @@
 https://codereview.stackexchange.com/questions/120331/passing-node-js-sql-connection-to-multiple-routes
 */
 
+// sharing connection with all js files
 var mysql = require('mysql');
 var settings = require('./settings.json');
 var db;
@@ -21,4 +22,5 @@ function connectDatabase() {
     return db;
 }
 
+// bamazonCustomer.js now has access
 module.exports = connectDatabase();

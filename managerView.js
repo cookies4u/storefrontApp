@@ -1,53 +1,53 @@
+// npm packages 
 var mysql = require("mysql");
 var inquirer = require("inquirer");
 
+// connection to mySQL database
 var connection = require('./db');
 
 var managerView = function() {
 	// option A or option B to avoid callback error using 'this'
 	// this.startManager = this.startManager.bind(this); // Option A: when pass as argument lose what this is thus need this
-	// this.startManager = this.startManager.bind(this); // Option A: when pass as argument lose what this is thus need this
 };
 
-//try calling it something like callback1()
-managerView.prototype.startManager = function(callbackManager) {  // doesn't work when a prototype will only work once then will get error callback not a function
-//managerView.prototype.startManager = function(callback) {  // doesn't work when a prototype will only work once then will get error callback not a function
-  inquirer.prompt({
-    name: "Views",
-    type: "list",
-    message: "Which view would you like?",
-    choices: ["View Products", "View Low Inventory", "Add to Inventory", "Add New product", "Back to Main"]
-  }).then((answer) => {
-    // based on their answer
-    if (answer.Views === "View Products") {
+// method to perform manager actions
+managerView.prototype.startManager = function(callbackManager) { 
+	// inquirer used to prompt user via terminal/bash. asking for manager action
+	inquirer.prompt({
+		name: "managerViews",
+		type: "list",
+		message: "Which view would you like?",
+		choices: ["View Products", "View Low Inventory", "Add to Inventory", "Add New product", "Back to Main"]
+	}).then((answer) => { // based on user input will run one of the following functions
+    if (answer.managerViews === "View Products") {
         // showProducts(this.startManager); // Option A
         showProducts(() => this.startManager()); // option B: instead of bind
     }
-    else if (answer.Views === "View Low Inventory") {
+    else if (answer.managerViews === "View Low Inventory") {
     	// lowInventory(this.startManager); // Option A
-    	console.log("7777777777");
         lowInventory(() => this.startManager()); // option B: instead of bind
     }
-    else if (answer.Views === "Add to Inventory") {
+    else if (answer.managerViews === "Add to Inventory") {
      	// addInventory(this.startManager); // Option A
         addInventory(() => this.startManager()); // option B: instead of bind
     }
-    else if (answer.Views === "Add New product") {
+    else if (answer.managerViews === "Add New product") {
      	// addProduct(this.startManager); // Option A
         addProduct(() => this.startManager()); // option B: instead of bind
     }
-    else if (answer.Views === "Back to Main") {
-    	callbackManager(); //try calling it something like callback1()
+    else if (answer.managerViews === "Back to Main") {
+    	callbackManager();
     }
   });
 };
 
-showProducts = function(callback) {
+// function will show all items in the products table
+showProducts = function(callbackshowProducts) {
 	var query = "SELECT * FROM products";
-
+	// using mySQL connection to run queryDBquantity
 	connection.query(query, function(err, res) {
 		if (err) throw err;
-		// console.log(res); // return arry with objects within
+		// will print the products table from mySQL to terminal
 		for (var i = 0; i < res.length; i++) {
 			console.log(
 				"item_id: " + res[i].item_id 
@@ -58,27 +58,28 @@ showProducts = function(callback) {
 				+ " || product sales: " + res[i].product_sales
 			);
 		}
-		callback();
+		callbackshowProducts();
 	});
 };
 
-lowInventory = function(callback) {
+// function returns low invetory products
+lowInventory = function(callbacklowInventory) {
 	var query = "SELECT product_name, stock_quantity FROM products WHERE stock_quantity < 5";
-	console.log(" xxxxxxxxxxx ");
+	// using mySQL connection to run queryDBquantity
 	connection.query(query, function(err, res) {
 		if (err) throw err;
-		// console.log(res); // return arry with objects within
+		// will print low inventory products with less than 5 in quantity
 		for (var i = 0; i < res.length; i++) {
 			console.log(
 				  " lowInventory product: " + res[i].product_name 
 				+ " || lowInventory quantity: " + res[i].stock_quantity
 			);
 		}
-		callback();
+		callbacklowInventory();
 	});
 };
 
-
+// user prompts called with inquirer.prompt. prompt via terminal
 var itemSelector = [ 
 	{
 		type: "input",
@@ -94,24 +95,21 @@ var quantitySelector = [
 	}
 ];
 
-
-addInventory = function(callback) {
+// function to update mySQL department table by increasing quantity based on the product the user selects
+addInventory = function(callbackaddInventory) {
+	// inquirer used to prompt user via terminal/bash. asking for product id
 	inquirer.prompt(itemSelector).then(function (answers1){
 		var item_selected = answers1.item_id;
-		console.log("item_selected " + item_selected);
-		//throw new Error("xxxxxxxxxxx");
 		var queryDBquantity = "SELECT price, stock_quantity FROM products WHERE ?";
+		// using mySQL connection to run queryDBquantity
 		connection.query(queryDBquantity, {
 		  item_id: item_selected
 		}, function(err, res) {
 			if (err) throw err;
-
-			var quantityDB = res[0].stock_quantity;
-
+			var quantityDB = res[0].stock_quantity; // saving mySQL output to variables
+			// inquirer used to prompt user via terminal/bash. asking for quantity
 			inquirer.prompt(quantitySelector).then(function (answers2){
 				var quantity_selected = answers2.stock_quantity;
-				console.log("quantityDB " + quantityDB);
-				//quantityDB += quantity_selected;
 				quantityDB = parseInt(quantityDB, 10) + parseInt(quantity_selected, 10);
 				var queryUpdateQuantity = "UPDATE products SET ? WHERE ?";
 				connection.query(queryUpdateQuantity, [{
@@ -120,7 +118,7 @@ addInventory = function(callback) {
 					item_id: item_selected
 				}], function(err, res) { 
 					if(err) {console.log(err);}
-					else { callback(); }
+					else { callbackaddInventory(); }
 					
 				});
 			});
@@ -128,6 +126,7 @@ addInventory = function(callback) {
 	});
 };
 
+// user prompts called with inquirer.prompt. prompt via terminal
 var addItemSelector = [ 
 	{
 		type: "input",
@@ -151,14 +150,16 @@ var addItemSelector = [
 	}
 ];
 
+// function to update mySQL product table by adding a new product
 addProduct = function(callbackaddProduct) {
+	// inquirer used to prompt user via terminal/bash. asking for all the information related to inserting a new product
 	inquirer.prompt(addItemSelector).then(function (answers){
-		console.log("i'm in");
 		connection.query("INSERT INTO products SET ?", {
-		  product_name: answers.product,
-		  department_name: answers.department,
-		  price: answers.prices,
-		  stock_quantity: answers.quantity
+			// fills in the SET clause
+			product_name: answers.product,
+			department_name: answers.department,
+			price: answers.prices,
+			stock_quantity: answers.quantity
 		}, function(err, res) {
 			if (err) throw err;
       		console.log("Your auction was created successfully!");
