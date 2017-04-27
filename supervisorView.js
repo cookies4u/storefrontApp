@@ -44,7 +44,7 @@ var costSelector = [
 	{
 		type: "input",
 		name: "over_head_costs",
-		message: "whats the cost of this item"
+		message: "whats the overhead cost of this item"
 	}
 ];
 
